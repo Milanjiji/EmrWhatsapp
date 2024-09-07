@@ -14,7 +14,10 @@
     "react": "18.2.0",
     "react-native": "0.71.19",
     "react-native-android-sms-listener-background": "^0.0.1",
-    "react-native-background-actions": "^4.0.1"
+    "react-native-background-actions": "^4.0.1",
+    "react-native-contacts": "^7.0.8",
+    "react-native-mmkv": "^2.11.0",
+    "react-native-vector-icons": "^10.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

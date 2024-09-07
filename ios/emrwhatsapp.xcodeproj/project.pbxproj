@@ -14,6 +14,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-emrwhatsapp-emrwhatsappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-emrwhatsapp-emrwhatsappTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		C61F379B434B4134A77E5D79 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F97B8181FF79447F967E2543 /* Poppins-Bold.ttf */; };
+		85E3A039572E44B4AF0B9E7A /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F3C5856BDE454D82B5B249A4 /* Poppins-Medium.ttf */; };
+		9308696301A3457FBADF1454 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E1761A81E9354F9BA1D537AB /* Poppins-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,9 @@
 		89C6BE57DB24E9ADA2F236DE /* Pods-emrwhatsapp-emrwhatsappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-emrwhatsapp-emrwhatsappTests.release.xcconfig"; path = "Target Support Files/Pods-emrwhatsapp-emrwhatsappTests/Pods-emrwhatsapp-emrwhatsappTests.release.xcconfig"; sourceTree = "<group>"; };
 		CD42C8902BDBCB100036610F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = emrwhatsapp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F97B8181FF79447F967E2543 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; name = "Poppins-Bold.ttf"; path = "../assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F3C5856BDE454D82B5B249A4 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; name = "Poppins-Medium.ttf"; path = "../assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E1761A81E9354F9BA1D537AB /* Poppins-Regular.ttf */ = {isa = PBXFileReference; name = "Poppins-Regular.ttf"; path = "../assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +130,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7165D00B3FCA421988F2061B /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -149,6 +156,17 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		7165D00B3FCA421988F2061B /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				F97B8181FF79447F967E2543 /* Poppins-Bold.ttf */,
+				F3C5856BDE454D82B5B249A4 /* Poppins-Medium.ttf */,
+				E1761A81E9354F9BA1D537AB /* Poppins-Regular.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -246,6 +264,9 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				C61F379B434B4134A77E5D79 /* Poppins-Bold.ttf in Resources */,
+				85E3A039572E44B4AF0B9E7A /* Poppins-Medium.ttf in Resources */,
+				9308696301A3457FBADF1454 /* Poppins-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
