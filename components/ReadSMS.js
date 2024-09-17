@@ -34,7 +34,7 @@ const ListenSMS = () => {
   }
 
   useEffect(() => {
-    // Subscribe to foreground events
+
     const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:
