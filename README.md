@@ -11,8 +11,8 @@ for example - Otp service is based on sms
 
 # How 
 
-andorid app is in the release
-download on the sender and reciver device
+andorid app is in the release,
+download on the sender and reciver device,
 chat...
 
 ## Limitation
