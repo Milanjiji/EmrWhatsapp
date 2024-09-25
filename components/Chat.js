@@ -1,5 +1,5 @@
 import React, { useEffect, useState,useRef } from "react";
-import { View, Text, TextInput,PermissionsAndroid, FlatList, Animated, TouchableOpacity, ScrollView,Alert } from "react-native";
+import { View, Text, TextInput,PermissionsAndroid, FlatList, Animated, TouchableOpacity, ScrollView,Alert,Keyboard } from "react-native";
 import notifee, { EventType, AndroidImportance } from '@notifee/react-native';
 import SmsListener,{SmsRetriever} from 'react-native-android-sms-listener-background';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -143,157 +143,164 @@ const Chat = (props) => {
                 SmsListener.addListener(message => {
 
                     console.info(message);
-                    const cheak = base64.decode(message.body);
-                    console.log(cheak.slice(0,3),"cheak system");
+                    const doubleCheak = message.body.slice(0,3)
                     
-                    if(cheak.slice(0,3) === '000'){
-                        message.body = base64.decode(message.body).slice(3)
-                        console.log(message.body);
+                    console.log(doubleCheak,"double cheak");
+
+                    if(doubleCheak == '000'){
+                        const cheak = base64.decode(message.body.slice(3));
+                        console.log(cheak,"cheak");
                         
-                        if(message.originatingAddress.slice(0,1) == '+'){
-                            message.originatingAddress = message.originatingAddress.slice(3);
-                        }
-                        
-                        const displayNotification = async (name,body) =>{
-                            try {
-                                const channelId = await notifee.createChannel({
-                                    id: 'default',
-                                    name: 'Default Channel',
-                                    importance: AndroidImportance.HIGH, 
-                                });
+                        if(cheak.slice(0,3) === '000'){
+                            message.body = base64.decode(message.body.slice(3)).slice(3)
+                            console.log(message.body);
                             
-                                await notifee.displayNotification({
-                                    title: name,
-                                    body: body,
-                                    android: {
-                                    channelId,
-                                    importance: AndroidImportance.HIGH, 
-                                    pressAction: {
+                            if(message.originatingAddress.slice(0,1) == '+'){
+                                message.originatingAddress = message.originatingAddress.slice(3);
+                            }
+                            
+                            const displayNotification = async (name,body) =>{
+                                try {
+                                    const channelId = await notifee.createChannel({
                                         id: 'default',
-                                    },
-                                    },
-                                });
-                            } catch (error) {
-                                console.error('Failed to display notification:', error);
-                            } 
-                        }
-                        
-    
-                        const rawData = storage.getString('chatlist');
-                        const forFindingNumberRawData = [[]];
-                        
-                        if(rawData !== undefined){
-                            console.log("raw data is definded",rawData);
-                            forFindingNumberRawData.push(JSON.parse(rawData)); 
-                        }else{
-                            forFindingNumberRawData.push([{name:'Smaple name',number:'0000000000'}])
-                        }
-                        console.log(forFindingNumberRawData,"for finding raw data");
-                        
-                        
-                        const contactFinder = forFindingNumberRawData[1].find(contact => contact.number.replace(/[^\d]/g, '') == message.originatingAddress);
-                        console.log(contactFinder,forFindingNumberRawData[0],"contact finder");
-                        
-                        if(contactFinder === undefined){
-                            //if number if not identified
-                            console.log("contact finder undefined");
+                                        name: 'Default Channel',
+                                        importance: AndroidImportance.HIGH, 
+                                    });
+                                
+                                    await notifee.displayNotification({
+                                        title: name,
+                                        body: body,
+                                        android: {
+                                        channelId,
+                                        importance: AndroidImportance.HIGH, 
+                                        pressAction: {
+                                            id: 'default',
+                                        },
+                                        },
+                                    });
+                                } catch (error) {
+                                    console.error('Failed to display notification:', error);
+                                } 
+                            }
                             
-                            const getChatList = () =>{
-                                console.log("gvetting chatlist started");
-                                
-                                if( !rawData || rawData === undefined){
-                                    // if there is no existing chat
-                                    const keygenerator = Math.floor(Math.random() * 10000);
-                                    const msgData = [{message:base64.decode(message.body),key:keygenerator,author:'user'}];
-    
-                                    storage.set(message.originatingAddress,JSON.stringify(msgData));
-            
-                                    data = [{name:message.originatingAddress,number:message.originatingAddress}];
-                                    const reorderedList = reorderChatList([...data],message.originatingAddress);
-                                    
-                                    storage.set('chatlist',JSON.stringify(reorderedList))
-                                    setChatList(reorderedList);
-                                    displayNotification(message.originatingAddress,message.body)
-                                    
-                                }else{
-                                    //if there is existing chat
-                                    const data = JSON.parse(rawData)
-                                    const newData = [...data,{name:message.originatingAddress,number:message.originatingAddress}]
-                                    const reorderedList = reorderChatList([...newData],message.originatingAddress);
-                                    
-                                    setChatList(reorderedList);
-                                    storage.set('chatlist',JSON.stringify(reorderedList));
-    
-                                    const getChatData = storage.getString(message.originatingAddress);
-    
-                                    if( !getChatData || getChatData === undefined){
-    
-                                        const keygenerator = Math.floor(Math.random() * 10000);
-                                        const data = [{message:message.body,key:keygenerator,author:'user'}];
-                                        storage.set(message.originatingAddress,JSON.stringify(data));
-                                        console.log(data,"storage setting if there is no chat data for specific number recived");
-                                    }else{
-                                        const data = JSON.parse(getChatData);
-                                        const keygenerator = Math.floor(Math.random() * 10000);
-                                        const newData = [...data,{message:message.body,key:keygenerator,author:'user'}];
-                                        console.log(newData,"sorage setting if there is chat data");
-                                        storage.set(message.originatingAddress,JSON.stringify(newData));
-                                    }
-                                    displayNotification(message.originatingAddress,message.body)
-                                }
-                              }
-                              getChatList();
-            
-                        }else{
-                            // if number is identified 
-                            const getChatData = storage.getString(message.originatingAddress);
-                            const OpenChatNumber = storage.getString('openChatNumber');
+        
+                            const rawData = storage.getString('chatlist');
+                            const forFindingNumberRawData = [[]];
                             
-                            if(getChatData === undefined || getChatData === 'undefined'){
-                                //if there is no messages 
-                                const keygenerator = Math.floor(Math.random() * 10000);
-                                const newData = [{message:message.body,key:keygenerator,author:'user'}];
-                                console.log([...chatList],"initial Chatlist")
-                                
-                                const chatlist = JSON.parse(rawData);
-    
-                                const reOrderedChatList = reorderChatList([...chatList],message.originatingAddress)
-                                setChatList(reOrderedChatList)
-                                storage.set('chatlist',JSON.stringify(reOrderedChatList))
-                                console.log("New reorderd ChatList",reOrderedChatList);
-                                
-                                storage.set(message.originatingAddress,JSON.stringify(newData));
-                                if(OpenChatNumber === message.originatingAddress){
-                                    console.log("open chat is currently using ");
-                                    getOpenChatData(message.originatingAddress);
-                                }else{
-                                    displayNotification(contactFinder.name.message.body)
-                                }
-    
+                            if(rawData !== undefined){
+                                console.log("raw data is definded",rawData);
+                                forFindingNumberRawData.push(JSON.parse(rawData)); 
                             }else{
+                                forFindingNumberRawData.push([{name:'Smaple name',number:'0000000000'}])
+                            }
+                            console.log(forFindingNumberRawData,"for finding raw data");
+                            
+                            
+                            const contactFinder = forFindingNumberRawData[1].find(contact => contact.number.replace(/[^\d]/g, '') == message.originatingAddress);
+                            console.log(contactFinder,forFindingNumberRawData[0],"contact finder");
+                            
+                            if(contactFinder === undefined){
+                                //if number if not identified
+                                console.log("contact finder undefined");
                                 
-                                const data = JSON.parse(getChatData);
-                                const keygenerator = Math.floor(Math.random() * 10000);
-                                const newData = [...data,{message:message.body,key:keygenerator,author:'user'}];
-                                storage.set(message.originatingAddress,JSON.stringify(newData));
+                                const getChatList = () =>{
+                                    console.log("gvetting chatlist started");
+                                    
+                                    if( !rawData || rawData === undefined){
+                                        // if there is no existing chat
+                                        const keygenerator = Math.floor(Math.random() * 10000);
+                                        const msgData = [{message:base64.decode(message.body),key:keygenerator,author:'user'}];
+        
+                                        storage.set(message.originatingAddress,JSON.stringify(msgData));
+                
+                                        data = [{name:message.originatingAddress,number:message.originatingAddress}];
+                                        const reorderedList = reorderChatList([...data],message.originatingAddress);
+                                        
+                                        storage.set('chatlist',JSON.stringify(reorderedList))
+                                        setChatList(reorderedList);
+                                        displayNotification(message.originatingAddress,message.body)
+                                        
+                                    }else{
+                                        //if there is existing chat
+                                        const data = JSON.parse(rawData)
+                                        const newData = [...data,{name:message.originatingAddress,number:message.originatingAddress}]
+                                        const reorderedList = reorderChatList([...newData],message.originatingAddress);
+                                        
+                                        setChatList(reorderedList);
+                                        storage.set('chatlist',JSON.stringify(reorderedList));
+        
+                                        const getChatData = storage.getString(message.originatingAddress);
+        
+                                        if( !getChatData || getChatData === undefined){
+        
+                                            const keygenerator = Math.floor(Math.random() * 10000);
+                                            const data = [{message:message.body,key:keygenerator,author:'user'}];
+                                            storage.set(message.originatingAddress,JSON.stringify(data));
+                                            console.log(data,"storage setting if there is no chat data for specific number recived");
+                                        }else{
+                                            const data = JSON.parse(getChatData);
+                                            const keygenerator = Math.floor(Math.random() * 10000);
+                                            const newData = [...data,{message:message.body,key:keygenerator,author:'user'}];
+                                            console.log(newData,"sorage setting if there is chat data");
+                                            storage.set(message.originatingAddress,JSON.stringify(newData));
+                                        }
+                                        displayNotification(message.originatingAddress,message.body)
+                                    }
+                                  }
+                                  getChatList();
+                
+                            }else{
+                                // if number is identified 
+                                const getChatData = storage.getString(message.originatingAddress);
+                                const OpenChatNumber = storage.getString('openChatNumber');
                                 
-                                const chatlist = JSON.parse(rawData);
-    
-                                const reOrderedChatList = reorderChatList([...chatlist],message.originatingAddress)
-                                setChatList(reOrderedChatList)
-                                storage.set('chatlist',JSON.stringify(reOrderedChatList))
-                                console.log("New reorderd ChatList",reOrderedChatList);
-    
-                                if(OpenChatNumber === message.originatingAddress){
-                                    console.log("open chat is currently using ");
-                                    getOpenChatData(message.originatingAddress);
+                                if(getChatData === undefined || getChatData === 'undefined'){
+                                    //if there is no messages 
+                                    const keygenerator = Math.floor(Math.random() * 10000);
+                                    const newData = [{message:message.body,key:keygenerator,author:'user'}];
+                                    console.log([...chatList],"initial Chatlist")
+                                    
+                                    const chatlist = JSON.parse(rawData);
+        
+                                    const reOrderedChatList = reorderChatList([...chatlist],message.originatingAddress)
+                                    setChatList(reOrderedChatList)
+                                    storage.set('chatlist',JSON.stringify(reOrderedChatList))
+                                    console.log("New reorderd ChatList",reOrderedChatList);
+                                    
+                                    storage.set(message.originatingAddress,JSON.stringify(newData));
+                                    if(OpenChatNumber === message.originatingAddress){
+                                        console.log("open chat is currently using ");
+                                        getOpenChatData(message.originatingAddress);
+                                    }else{
+                                        displayNotification(contactFinder.name.message.body)
+                                    }
+        
                                 }else{
-                                    displayNotification(contactFinder.name,message.body)
+                                    
+                                    const data = JSON.parse(getChatData);
+                                    const keygenerator = Math.floor(Math.random() * 10000);
+                                    const newData = [...data,{message:message.body,key:keygenerator,author:'user'}];
+                                    storage.set(message.originatingAddress,JSON.stringify(newData));
+                                    
+                                    const chatlist = JSON.parse(rawData);
+        
+                                    const reOrderedChatList = reorderChatList([...chatlist],message.originatingAddress)
+                                    setChatList(reOrderedChatList)
+                                    storage.set('chatlist',JSON.stringify(reOrderedChatList))
+                                    console.log("New reorderd ChatList",reOrderedChatList);
+        
+                                    if(OpenChatNumber === message.originatingAddress){
+                                        console.log("open chat is currently using ");
+                                        getOpenChatData(message.originatingAddress);
+                                    }else{
+                                        displayNotification(contactFinder.name,message.body)
+                                    }
                                 }
                             }
+        
                         }
-    
                     }
+                    
                 });
                 //
                 setListnerState(true)
@@ -313,9 +320,10 @@ const Chat = (props) => {
 
     const getOpenChatData = (number) =>{
         const getChatData = storage.getString(number);
-
-        if(getChatData === undefined || getChatData === 'undefined'){
-            setOpenChatData([])
+        console.log(getChatData,"get chat data");
+        
+        if(getChatData == undefined || getChatData == ''){
+            setOpenChatData([]);
         }else{
             const data = JSON.parse(getChatData);
             setOpenChatData(data)
@@ -500,9 +508,11 @@ const Chat = (props) => {
         }
 
         const sendMessage = () =>{
-
+            Keyboard.dismiss()
             const phoneNumber = normalizePhoneNumber(OpenChatNumber);
-            const result =  SendSms.SendSMS(phoneNumber, base64.encode("000"+message));
+            const result =  SendSms.SendSMS(phoneNumber, `000${base64.encode("000"+message)}`);
+            console.log("000"+base64.encode("000"+message));
+            
             const keygenerator = Math.floor(Math.random() * 10000);
             const data = [...openChatData,{message:message,key:keygenerator,author:'me'}];
 
@@ -556,20 +566,20 @@ const Chat = (props) => {
                     <View style={{display:'flex',flex:1,alignItems:'center',justifyContent:'space-between',flexDirection:'row'}} >
                         <View>
                             <Text style={{color:'black',display:editTextInputNumber == item.number ? 'none' :'flex'}} >{item.name}</Text>
-                            <TextInput onBlur={()=>{setEditTextInputNumber('');setEditMenuNumber('')}} ref={inputRef}  value={editNewNumber} onChangeText={setEditNewNumber} style={{display:editTextInputNumber == item.number ? 'flex' :'none',borderBottomColor:Colors.primary,borderBottomWidth:1,flex:1}}  placeholder="Enter new name..." />
+                            <TextInput  onBlur={()=>{setEditTextInputNumber('');setEditMenuNumber('')}} ref={inputRef}  value={editNewNumber} onChangeText={setEditNewNumber} style={{display:editTextInputNumber == item.number ? 'flex' :'none',borderBottomColor:Colors.primary,borderBottomWidth:1,flex:1}}  placeholder="Enter new name..." />
                         </View>
                         
-                        <View style={{display:'flex',flexDirection:'row',}} >
-                            <TouchableOpacity onPress={()=>EditContact(item.number)} style={{marginRight:10,display:editNewNumber.length > 1 && editMenuNumber == item.number ? 'flex' : 'none',paddingHorizontal:10}} >
+                        <View style={{display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center'}} >
+                            <TouchableOpacity onPress={()=>EditContact(item.number)} style={{marginRight:10,display:editNewNumber.length > 1 && editMenuNumber == item.number ? 'flex' : 'none',paddingHorizontal:10,backgroundColor:'red',paddingVertical:6}} >
                                 <Icon name="check" size={15} color="#000" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>DeleteContact(item.number)} style={{marginRight:10,display:editMenuNumber == item.number ? 'flex' : 'none'}} >
+                            <TouchableOpacity onPress={()=>DeleteContact(item.number)} style={{marginRight:10,display:editMenuNumber == item.number ? 'flex' : 'none',paddingHorizontal:10}} >
                                 <Icon name="delete" size={15} color="#ff6666" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={EditTextInput} style={{marginRight:10,display:editMenuNumber == item.number ? 'flex' : 'none'}} >
+                            <TouchableOpacity onPress={EditTextInput} style={{marginRight:10,display:editMenuNumber == item.number ? 'flex' : 'none',paddingHorizontal:10}} >
                                 <Icon name="edit" size={15} color="#000" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>{editMenuNumber == item.number ? setEditMenuNumber('') : setEditMenuNumber(item.number)}} style={{transform:[{rotate:"90deg"}],marginRight:10}} >
+                            <TouchableOpacity onPress={()=>{editMenuNumber == item.number ? setEditMenuNumber('') : setEditMenuNumber(item.number)}} style={{transform:[{rotate:"90deg"}],marginRight:10,paddingHorizontal:10}} >
                                 <Icon name="ellipsis1" size={15} color="#000" />
                             </TouchableOpacity>
                             <Icon name="down" size={15} color="#000" />
@@ -586,7 +596,7 @@ const Chat = (props) => {
                         />
                     </Animated.ScrollView>
                     <View style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexDirection:'row',marginTop:10}} >
-                        <TextInput placeholder="message..." value={message}  onChangeText={setMessage} 
+                        <TextInput returnKeyType="done" blurOnSubmit={false} placeholder="message..." value={message}  onChangeText={setMessage} 
                         style={{backgroundColor:Colors.secondary,flex:1,paddingHorizontal:chatState ? 20 : 0,paddingVertical:chatState ? 10 : 0,borderRadius:20,marginRight:10}} />
                         <TouchableOpacity onPress={sendMessage}>
                             <FontisoIcon name="paper-plane" size={20} color="#000" style={{backgroundColor:Colors.primary,padding:13,borderRadius:30}} />
